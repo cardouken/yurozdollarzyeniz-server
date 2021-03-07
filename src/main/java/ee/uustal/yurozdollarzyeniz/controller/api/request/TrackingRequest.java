@@ -1,21 +1,25 @@
 package ee.uustal.yurozdollarzyeniz.controller.api.request;
 
+import javax.validation.constraints.NotNull;
+
 public class TrackingRequest {
 
-    private int workingHoursInMonth;
+
+    @NotNull
     private int workDayStartHour;
-    private int workDayEndHour;
-    private int salaryPeriodStartDay;
+
+    @NotNull
+    private int workDayLengthInHours;
+
+    @NotNull
+    private int salaryDate;
+
+    @NotNull
     private double monthlySalary;
 
-    public int getWorkingHoursInMonth() {
-        return workingHoursInMonth;
-    }
+    private int workingHoursInMonth;
 
-    public TrackingRequest setWorkingHoursInMonth(int workingHoursInMonth) {
-        this.workingHoursInMonth = workingHoursInMonth;
-        return this;
-    }
+    private String locale;
 
     public int getWorkDayStartHour() {
         return workDayStartHour;
@@ -26,21 +30,21 @@ public class TrackingRequest {
         return this;
     }
 
-    public int getWorkDayEndHour() {
-        return workDayEndHour;
+    public int getWorkDayLengthInHours() {
+        return workDayLengthInHours;
     }
 
-    public TrackingRequest setWorkDayEndHour(int workDayEndHour) {
-        this.workDayEndHour = workDayEndHour;
+    public TrackingRequest setWorkDayLengthInHours(int workDayLengthInHours) {
+        this.workDayLengthInHours = workDayLengthInHours;
         return this;
     }
 
-    public int getSalaryPeriodStartDay() {
-        return salaryPeriodStartDay;
+    public int getSalaryDate() {
+        return salaryDate;
     }
 
-    public TrackingRequest setSalaryPeriodStartDay(int salaryPeriodStartDay) {
-        this.salaryPeriodStartDay = salaryPeriodStartDay;
+    public TrackingRequest setSalaryDate(int salaryDate) {
+        this.salaryDate = salaryDate;
         return this;
     }
 
@@ -50,6 +54,24 @@ public class TrackingRequest {
 
     public TrackingRequest setMonthlySalary(double monthlySalary) {
         this.monthlySalary = monthlySalary;
+        return this;
+    }
+
+    public int getWorkingHoursInMonth() {
+        return workingHoursInMonth;
+    }
+
+    public TrackingRequest setWorkingHoursInMonth(int workingHoursInMonth) {
+        this.workingHoursInMonth = workingHoursInMonth;
+        return this;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public TrackingRequest setLocale(String locale) {
+        this.locale = locale;
         return this;
     }
 }

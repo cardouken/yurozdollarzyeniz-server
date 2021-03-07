@@ -11,7 +11,7 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
 
     private int workingHoursInMonth = 184;
     private int workDayStartHour = 10;
-    private int workDayEndHour = 18;
+    private int workDayLengthInHours = 8;
     private int salaryPeriodStartDay = 28;
     private double monthlySalary = 2700;
 
@@ -19,27 +19,27 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
         this.trackingService = trackingService;
     }
 
-    public GetTrackingBuilder setWorkingHoursInMonth(int workingHoursInMonth) {
+    public GetTrackingBuilder workingHoursInMonth(int workingHoursInMonth) {
         this.workingHoursInMonth = workingHoursInMonth;
         return this;
     }
 
-    public GetTrackingBuilder setWorkDayStartHour(int workDayStartHour) {
+    public GetTrackingBuilder workDayStartHour(int workDayStartHour) {
         this.workDayStartHour = workDayStartHour;
         return this;
     }
 
-    public GetTrackingBuilder setWorkDayEndHour(int workDayEndHour) {
-        this.workDayEndHour = workDayEndHour;
+    public GetTrackingBuilder workingHours(int workDayLengthInHours) {
+        this.workDayLengthInHours = workDayLengthInHours;
         return this;
     }
 
-    public GetTrackingBuilder setSalaryPeriodStartDay(int salaryPeriodStartDay) {
+    public GetTrackingBuilder salaryDate(int salaryPeriodStartDay) {
         this.salaryPeriodStartDay = salaryPeriodStartDay;
         return this;
     }
 
-    public GetTrackingBuilder setMonthlySalary(double monthlySalary) {
+    public GetTrackingBuilder monthlySalary(double monthlySalary) {
         this.monthlySalary = monthlySalary;
         return this;
     }
@@ -50,9 +50,9 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
                 new TrackingRequest()
                         .setMonthlySalary(monthlySalary)
                         .setWorkDayStartHour(workDayStartHour)
-                        .setWorkDayEndHour(workDayEndHour)
+                        .setWorkDayLengthInHours(workDayLengthInHours)
                         .setWorkingHoursInMonth(workingHoursInMonth)
-                        .setSalaryPeriodStartDay(salaryPeriodStartDay)
+                        .setSalaryDate(salaryPeriodStartDay)
         );
     }
 }
