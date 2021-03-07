@@ -92,8 +92,8 @@ public class TrackingTest extends BaseTest {
         timeProvider.tamperTime(LocalDateTime.of(2024, 2, 28, 20, 0));
 
         // when -> then
-        getTracking().salaryDate(1).buildApi()
-                .assertThat("hoursWorked", "152")
+        getTracking().salaryDate(1).locale("EE").buildApi()
+                .assertThat("hoursWorked", "157")
                 .assertThat("daysUntilSalary", "2")
                 .assertThat("salaryPeriodStart", "2024-02-01T00:00:00.000Z");
     }
