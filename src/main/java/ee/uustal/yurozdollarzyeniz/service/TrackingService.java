@@ -3,12 +3,17 @@ package ee.uustal.yurozdollarzyeniz.service;
 import ee.uustal.yurozdollarzyeniz.config.TimeProvider;
 import ee.uustal.yurozdollarzyeniz.controller.api.request.TrackingRequest;
 import ee.uustal.yurozdollarzyeniz.controller.api.response.TrackingResponse;
+import ee.uustal.yurozdollarzyeniz.pojo.Holiday;
+import ee.uustal.yurozdollarzyeniz.service.http.DefaultCalendarificService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -16,20 +21,41 @@ import java.util.stream.Stream;
 public class TrackingService {
 
     private final TimeProvider timeProvider;
+    private final DefaultCalendarificService calendarificService;
+    private static final List<String> SHORTENED_DAY_LIST = List.of("Independence Day", "Victory Day", "Christmas Eve");
 
-    public TrackingService(TimeProvider timeProvider) {
+    public TrackingService(TimeProvider timeProvider, DefaultCalendarificService calendarificService) {
         this.timeProvider = timeProvider;
+        this.calendarificService = calendarificService;
     }
 
     public TrackingResponse track(TrackingRequest request) {
-        final int salaryDate = request.getSalaryDate();
-        final int workDayStartHour = request.getWorkDayStartHour();
-        final int workDayHours = request.getWorkDayLengthInHours();
-        final int workDayEndHour = workDayStartHour + workDayHours;
-        final double hourlySalary = request.getMonthlySalary() / request.getWorkingHoursInMonth();
+        final Predicate<LocalDateTime> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
+        final List<Holiday> weekDayHolidays = calendarificService.getHolidays(request.getLocale(), LocalDateTime.now().getYear());
         final LocalDateTime now = timeProvider.now();
 
-        final Predicate<LocalDateTime> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
+        final int workDayHours = request.getWorkDayLengthInHours();
+        long shortenedDayHours = 0;
+        if (Objects.equals(request.getLocale(), "EE")) {
+            shortenedDayHours = weekDayHolidays.stream()
+                    .filter(weekDayHoliday -> weekDayHoliday.getDate().getMonth() == now.getMonth())
+                    .filter(weekDayHoliday -> SHORTENED_DAY_LIST.contains(weekDayHoliday.getName()))
+                    .count();
+        }
+        final long excludedHolidays = weekDayHolidays.stream()
+                .filter(d -> d.getDate().getMonth() == now.getMonth())
+                .count();
+        long workDaysInMonth = Stream.iterate(now.withDayOfMonth(1), date -> date.plusDays(1))
+                .limit(now.getMonth().length(LocalDate.now().isLeapYear()))
+                .filter(isWeekend.negate())
+                .count() - excludedHolidays;
+
+        long workHoursInMonth = workDaysInMonth * workDayHours - shortenedDayHours * 3;
+        final int salaryDate = request.getSalaryDate();
+        final int workDayStartHour = request.getWorkDayStartHour();
+        final int workDayEndHour = workDayStartHour + workDayHours;
+        final double hourlySalary = request.getMonthlySalary() / workHoursInMonth;
+
         final Predicate<LocalDateTime> isWorkingHours = date -> date.getHour() >= workDayStartHour && date.getHour() <= workDayEndHour;
 
         LocalDateTime lastSalaryPaymentDate = timeProvider.now();
@@ -40,12 +66,12 @@ public class TrackingService {
         }
         daysSinceLastSalary = ChronoUnit.DAYS.between(lastSalaryPaymentDate, now.plusDays(1));
 
-        long businessDaysWorked = Stream.iterate(lastSalaryPaymentDate, date -> date.plusDays(1))
+        long hoursWorked = Stream.iterate(lastSalaryPaymentDate, date -> date.plusDays(1))
                 .limit(daysSinceLastSalary)
                 .filter(isWeekend.negate())
-                .count();
+                .count() * workDayHours;
+        hoursWorked = ((hoursWorked - (excludedHolidays * 8) - (shortenedDayHours * 3)));
 
-        long hoursWorked = businessDaysWorked * workDayHours;
         BigDecimal earnedTotal;
         BigDecimal earnedToday = null;
 
@@ -55,7 +81,7 @@ public class TrackingService {
             }
             earnedTotal = BigDecimal.valueOf(hourlySalary * hoursWorked);
         } else {
-            hoursWorked = (businessDaysWorked - 1) * workDayHours;
+            hoursWorked = (hoursWorked - workDayHours);
             final LocalDateTime dayStart = timeProvider.now().withHour(workDayStartHour);
 
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, now);

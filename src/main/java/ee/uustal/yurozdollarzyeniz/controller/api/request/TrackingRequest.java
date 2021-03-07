@@ -4,7 +4,6 @@ import javax.validation.constraints.NotNull;
 
 public class TrackingRequest {
 
-
     @NotNull
     private int workDayStartHour;
 
@@ -16,8 +15,6 @@ public class TrackingRequest {
 
     @NotNull
     private double monthlySalary;
-
-    private int workingHoursInMonth;
 
     private String locale;
 
@@ -54,15 +51,6 @@ public class TrackingRequest {
 
     public TrackingRequest setMonthlySalary(double monthlySalary) {
         this.monthlySalary = monthlySalary;
-        return this;
-    }
-
-    public int getWorkingHoursInMonth() {
-        return workingHoursInMonth;
-    }
-
-    public TrackingRequest setWorkingHoursInMonth(int workingHoursInMonth) {
-        this.workingHoursInMonth = workingHoursInMonth;
         return this;
     }
 

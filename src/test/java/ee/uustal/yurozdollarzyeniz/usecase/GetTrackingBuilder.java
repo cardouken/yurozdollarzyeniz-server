@@ -9,19 +9,14 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
 
     private final TrackingService trackingService;
 
-    private int workingHoursInMonth = 184;
     private int workDayStartHour = 10;
     private int workDayLengthInHours = 8;
     private int salaryPeriodStartDay = 28;
     private double monthlySalary = 2700;
+    private String locale;
 
     public GetTrackingBuilder(TrackingService trackingService) {
         this.trackingService = trackingService;
-    }
-
-    public GetTrackingBuilder workingHoursInMonth(int workingHoursInMonth) {
-        this.workingHoursInMonth = workingHoursInMonth;
-        return this;
     }
 
     public GetTrackingBuilder workDayStartHour(int workDayStartHour) {
@@ -44,6 +39,11 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
         return this;
     }
 
+    public GetTrackingBuilder locale(String locale) {
+        this.locale = locale;
+        return this;
+    }
+
     @Override
     public TrackingResponse build() {
         return trackingService.track(
@@ -51,8 +51,8 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
                         .setMonthlySalary(monthlySalary)
                         .setWorkDayStartHour(workDayStartHour)
                         .setWorkDayLengthInHours(workDayLengthInHours)
-                        .setWorkingHoursInMonth(workingHoursInMonth)
                         .setSalaryDate(salaryPeriodStartDay)
+                        .setLocale(locale)
         );
     }
 }

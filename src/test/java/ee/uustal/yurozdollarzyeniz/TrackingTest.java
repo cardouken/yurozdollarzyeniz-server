@@ -87,29 +87,29 @@ public class TrackingTest extends BaseTest {
     }
 
     @Test
-    public void workday_with_extended_hours() {
-        // when -> then
-        timeProvider.tamperTime(BEFORE_WORKING_HOURS);
-        getTracking().salaryDate(1).workDayStartHour(9).workingHours(16).buildApi()
-                .print()
-                .assertThat("earned", "469.57")
-                .assertThat("hourlyRate", "14.67")
-                .assertThat("hoursWorked", "32")
-                .assertThat("daysUntilSalary", "29")
-                .assertThat("salaryPeriodStart", "2021-03-01T00:00:00.000Z");
-    }
-
-    @Test
     public void test_leap_year() {
         // given
         timeProvider.tamperTime(LocalDateTime.of(2024, 2, 28, 20, 0));
 
         // when -> then
         getTracking().salaryDate(1).buildApi()
-                .assertThat("hoursWorked", "160")
+                .assertThat("hoursWorked", "152")
                 .assertThat("daysUntilSalary", "2")
                 .assertThat("salaryPeriodStart", "2024-02-01T00:00:00.000Z");
     }
 
+    @Test
+    public void test_working_hours_estonia() {
+        // given
+        timeProvider.tamperTime(LocalDateTime.of(2021, 6, 30, 23, 59));
+
+        // when -> then with Estonian locale which has 1 shortened day by 3 hours
+        getTracking().salaryDate(1).locale("EE").buildApi()
+                .assertThat("hoursWorked", "157");
+
+        // when -> without locale
+        getTracking().salaryDate(1).buildApi()
+                .assertThat("hoursWorked", "160");
+    }
 
 }
