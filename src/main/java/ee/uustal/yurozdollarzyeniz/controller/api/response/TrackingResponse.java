@@ -2,12 +2,12 @@ package ee.uustal.yurozdollarzyeniz.controller.api.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class TrackingResponse {
 
     private BigDecimal earned;
     private BigDecimal earnedToday;
+    private BigDecimal earnedOvertime;
     private BigDecimal hourlyRate;
     private LocalDate salaryPeriodStart;
     private long hoursWorked;
@@ -28,6 +28,15 @@ public class TrackingResponse {
 
     public TrackingResponse setEarnedToday(BigDecimal earnedToday) {
         this.earnedToday = earnedToday;
+        return this;
+    }
+
+    public BigDecimal getEarnedOvertime() {
+        return earnedOvertime;
+    }
+
+    public TrackingResponse setEarnedOvertime(BigDecimal earnedOvertime) {
+        this.earnedOvertime = earnedOvertime;
         return this;
     }
 

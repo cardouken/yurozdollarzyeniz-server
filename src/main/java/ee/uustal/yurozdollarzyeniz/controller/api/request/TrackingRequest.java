@@ -18,6 +18,8 @@ public class TrackingRequest {
 
     private String locale;
 
+    private Integer overtimeHours;
+
     public int getWorkDayStartHour() {
         return workDayStartHour;
     }
@@ -60,6 +62,15 @@ public class TrackingRequest {
 
     public TrackingRequest setLocale(String locale) {
         this.locale = locale;
+        return this;
+    }
+
+    public Integer getOvertimeHours() {
+        return overtimeHours;
+    }
+
+    public TrackingRequest setOvertimeHours(Integer overtimeHours) {
+        this.overtimeHours = overtimeHours;
         return this;
     }
 }

@@ -21,6 +21,8 @@ import java.util.stream.Stream;
 @Service
 public class TrackingService {
 
+    private static final double OVERTIME_MULTIPLIER = 1.5;
+
     private final TimeProvider timeProvider;
     private final DefaultCalendarificService calendarificService;
 
@@ -69,20 +71,25 @@ public class TrackingService {
                 .count();
         long hoursWorked = daysWorked * workDayLength - shortDayHours;
 
+        BigDecimal earnedOvertime = null;
+        if (request.getOvertimeHours() != null) {
+            earnedOvertime = BigDecimal.valueOf(request.getOvertimeHours() * hourlySalary * OVERTIME_MULTIPLIER);
+        }
+
         BigDecimal earnedTotal;
         BigDecimal earnedToday = null;
         if (!isWorkingHours.test(dateTimeNow) || isWeekend.test(dateNow) || isHoliday.test(dateNow)) {
             if (!isWeekend.test(dateNow) && dateTimeNow.isBefore(dateTimeNow.withHour(workDayStartHour))) {
                 hoursWorked -= workDayLength;
             }
-            earnedTotal = BigDecimal.valueOf(hourlySalary * hoursWorked);
+            earnedTotal = BigDecimal.valueOf(hourlySalary * hoursWorked).add(earnedOvertime);
         } else {
             hoursWorked = (hoursWorked - workDayLength);
             final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour);
 
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
             earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday);
-            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary));
+            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary)).add(earnedOvertime);
             hoursWorked += ChronoUnit.HOURS.between(dayStart, dateTimeNow);
         }
 
@@ -94,6 +101,7 @@ public class TrackingService {
         return new TrackingResponse()
                 .setEarned(earnedTotal)
                 .setEarnedToday(earnedToday)
+                .setEarnedOvertime(earnedOvertime)
                 .setHourlyRate(BigDecimal.valueOf(hourlySalary))
                 .setHoursWorked(hoursWorked)
                 .setSalaryPeriodStart(lastSalaryPaymentDate)
