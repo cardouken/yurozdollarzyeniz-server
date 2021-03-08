@@ -140,7 +140,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("earnedOvertime", "220.11")
                 .assertThat("earned", "484.24")
                 .assertThat("hourlyRate", "14.67")
-                .assertThat("hoursWorked", "18")
+                .assertThat("hoursWorked", "28")
                 .assertThat("daysUntilSalary", "25")
                 .assertThat("salaryPeriodStart", "2021-02-28");
     }
@@ -156,7 +156,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("earnedOvertime", "440.22")
                 .assertThat("earned", "704.35")
                 .assertThat("hourlyRate", "14.67")
-                .assertThat("hoursWorked", "18")
+                .assertThat("hoursWorked", "28")
                 .assertThat("daysUntilSalary", "25")
                 .assertThat("salaryPeriodStart", "2021-02-28");
     }
@@ -174,6 +174,16 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hoursWorked", "18")
                 .assertThat("daysUntilSalary", "25")
                 .assertThat("salaryPeriodStart", "2021-02-28");
+    }
+
+    @Test
+    public void test_workday_end() {
+        // given
+        timeProvider.tamperTime(LocalDateTime.of(2021, 6, 6, 18, 0));
+
+        // when
+        getTracking().workDayStartHour(10).workingHours(8).buildApi()
+                .assertNotExists("earnedToday");
     }
 
 }

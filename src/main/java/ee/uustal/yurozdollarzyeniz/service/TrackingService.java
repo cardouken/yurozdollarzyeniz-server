@@ -86,7 +86,7 @@ public class TrackingService {
                 earnedTotal = earnedTotal.add(earnedOvertime);
             }
         } else {
-            hoursWorked = (hoursWorked - workDayLength);
+            hoursWorked -= workDayLength;
             final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour).truncatedTo(ChronoUnit.HOURS);
 
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
@@ -108,7 +108,7 @@ public class TrackingService {
                 .setEarnedToday(earnedToday)
                 .setEarnedOvertime(earnedOvertime)
                 .setHourlyRate(BigDecimal.valueOf(hourlySalary))
-                .setHoursWorked(hoursWorked)
+                .setHoursWorked(hoursWorked + Optional.ofNullable(request.getOvertimeHours()).orElse(0))
                 .setSalaryPeriodStart(lastSalaryPaymentDate)
                 .setDaysUntilSalary(daysUntilNextSalary);
     }
