@@ -14,7 +14,8 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
     private int salaryPeriodStartDay = 28;
     private double monthlySalary = 2700;
     private String locale;
-    private int overtimeHours;
+    private Integer overtimeHours;
+    private Double overtimeMultiplier;
 
     public GetTrackingBuilder(TrackingService trackingService) {
         this.trackingService = trackingService;
@@ -50,6 +51,12 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
         return this;
     }
 
+    public GetTrackingBuilder overtimeHours(int overtimeHours, double multiplier) {
+        this.overtimeHours = overtimeHours;
+        this.overtimeMultiplier = multiplier;
+        return this;
+    }
+
     @Override
     public TrackingResponse build() {
         return trackingService.track(
@@ -60,6 +67,7 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
                         .setSalaryDate(salaryPeriodStartDay)
                         .setLocale(locale)
                         .setOvertimeHours(overtimeHours)
+                        .setOvertimeMultiplier(overtimeMultiplier)
         );
     }
 }

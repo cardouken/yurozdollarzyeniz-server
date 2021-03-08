@@ -21,8 +21,6 @@ import java.util.stream.Stream;
 @Service
 public class TrackingService {
 
-    private static final double OVERTIME_MULTIPLIER = 1.5;
-
     private final TimeProvider timeProvider;
     private final DefaultCalendarificService calendarificService;
 
@@ -38,6 +36,7 @@ public class TrackingService {
         final int workDayEndHour = workDayStartHour + workDayLength;
         final LocalDateTime dateTimeNow = timeProvider.dateTimeNow();
         final LocalDate dateNow = timeProvider.dateNow();
+        final Double overtimeMultiplier = Optional.ofNullable(request.getOvertimeMultiplier()).orElse(1.5);
 
         final List<LocalDate> weekDayHolidays = Optional.ofNullable(request.getLocale())
                 .map(l -> calendarificService.getHolidays(request.getLocale(), dateNow.getYear()))
@@ -73,7 +72,7 @@ public class TrackingService {
 
         BigDecimal earnedOvertime = null;
         if (request.getOvertimeHours() != null) {
-            earnedOvertime = BigDecimal.valueOf(request.getOvertimeHours() * hourlySalary * OVERTIME_MULTIPLIER);
+            earnedOvertime = BigDecimal.valueOf(request.getOvertimeHours() * hourlySalary * overtimeMultiplier);
         }
 
         BigDecimal earnedTotal;
@@ -89,7 +88,10 @@ public class TrackingService {
 
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
             earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday);
-            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary)).add(earnedOvertime);
+            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary));
+            if (earnedOvertime != null) {
+                earnedTotal = earnedTotal.add(earnedOvertime);
+            }
             hoursWorked += ChronoUnit.HOURS.between(dayStart, dateTimeNow);
         }
 

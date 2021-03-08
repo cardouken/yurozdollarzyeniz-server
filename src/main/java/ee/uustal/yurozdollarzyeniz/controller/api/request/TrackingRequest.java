@@ -1,24 +1,35 @@
 package ee.uustal.yurozdollarzyeniz.controller.api.request;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 public class TrackingRequest {
 
     @NotNull
+    @Min(0)
+    @Max(23)
     private int workDayStartHour;
 
     @NotNull
+    @Min(1)
+    @Max(24)
     private int workDayLengthInHours;
 
     @NotNull
+    @Min(1)
+    @Max(31)
     private int salaryDate;
 
     @NotNull
+    @Min(0)
     private double monthlySalary;
 
     private String locale;
 
     private Integer overtimeHours;
+
+    private Double overtimeMultiplier;
 
     public int getWorkDayStartHour() {
         return workDayStartHour;
@@ -71,6 +82,15 @@ public class TrackingRequest {
 
     public TrackingRequest setOvertimeHours(Integer overtimeHours) {
         this.overtimeHours = overtimeHours;
+        return this;
+    }
+
+    public Double getOvertimeMultiplier() {
+        return overtimeMultiplier;
+    }
+
+    public TrackingRequest setOvertimeMultiplier(Double overtimeMultiplier) {
+        this.overtimeMultiplier = overtimeMultiplier;
         return this;
     }
 }
