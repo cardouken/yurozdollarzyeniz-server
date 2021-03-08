@@ -81,7 +81,10 @@ public class TrackingService {
             if (!isWeekend.test(dateNow) && dateTimeNow.isBefore(dateTimeNow.withHour(workDayStartHour))) {
                 hoursWorked -= workDayLength;
             }
-            earnedTotal = BigDecimal.valueOf(hourlySalary * hoursWorked).add(earnedOvertime);
+            earnedTotal = BigDecimal.valueOf(hourlySalary * hoursWorked);
+            if (earnedOvertime != null) {
+                earnedTotal = earnedTotal.add(earnedOvertime);
+            }
         } else {
             hoursWorked = (hoursWorked - workDayLength);
             final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour);
