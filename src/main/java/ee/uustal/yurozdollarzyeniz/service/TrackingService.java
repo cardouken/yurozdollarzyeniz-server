@@ -89,7 +89,10 @@ public class TrackingService {
 
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
             earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday);
-            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary)).add(earnedOvertime);
+            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary));
+            if (earnedOvertime != null) {
+                earnedTotal = earnedTotal.add(earnedOvertime);
+            }
             hoursWorked += ChronoUnit.HOURS.between(dayStart, dateTimeNow);
         }
 

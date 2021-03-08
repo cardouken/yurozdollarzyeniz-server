@@ -145,4 +145,19 @@ public class TrackingTest extends BaseTest {
                 .assertThat("salaryPeriodStart", "2021-02-28");
     }
 
+    @Test
+    public void test_zero_salary() {
+        // given
+        timeProvider.tamperTime(WORK_HOURS);
+
+        // when -> then
+        getTracking().monthlySalary(0).buildApi()
+                .assertThat("earnedToday", "0.0")
+                .assertThat("earned", "0.0")
+                .assertThat("hourlyRate", "0.0")
+                .assertThat("hoursWorked", "18")
+                .assertThat("daysUntilSalary", "25")
+                .assertThat("salaryPeriodStart", "2021-02-28");
+    }
+
 }

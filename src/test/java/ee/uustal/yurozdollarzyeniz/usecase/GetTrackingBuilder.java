@@ -14,7 +14,7 @@ public class GetTrackingBuilder implements TestActionBuilder<TrackingResponse> {
     private int salaryPeriodStartDay = 28;
     private double monthlySalary = 2700;
     private String locale;
-    private int overtimeHours;
+    private Integer overtimeHours;
 
     public GetTrackingBuilder(TrackingService trackingService) {
         this.trackingService = trackingService;

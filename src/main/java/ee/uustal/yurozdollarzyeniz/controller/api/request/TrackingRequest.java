@@ -1,19 +1,28 @@
 package ee.uustal.yurozdollarzyeniz.controller.api.request;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 public class TrackingRequest {
 
     @NotNull
+    @Min(0)
+    @Max(23)
     private int workDayStartHour;
 
     @NotNull
+    @Min(1)
+    @Max(24)
     private int workDayLengthInHours;
 
     @NotNull
+    @Min(1)
+    @Max(31)
     private int salaryDate;
 
     @NotNull
+    @Min(0)
     private double monthlySalary;
 
     private String locale;
