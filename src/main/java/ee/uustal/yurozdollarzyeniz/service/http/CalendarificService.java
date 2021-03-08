@@ -19,8 +19,7 @@ import java.util.stream.Collectors;
 @Profile("!test")
 public class CalendarificService implements DefaultCalendarificService {
 
-    //    private static final String API_KEY = System.getenv("API_KEY");
-    private static final String API_KEY = "f9dcd1e9320bab5c0c17cd2545dd4d396e1f41c7";
+    private static final String API_KEY = System.getenv("API_KEY");
     private static final String BASE_URI = "https://calendarific.com/api";
 
     private final RestTemplate calendarificRestTemplate;
