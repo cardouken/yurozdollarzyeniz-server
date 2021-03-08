@@ -44,7 +44,7 @@ public class TrackingService {
 
         final Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
         final Predicate<LocalDate> isHoliday = date -> weekDayHolidays.stream().anyMatch(wdh -> Objects.equals(wdh, date));
-        final Predicate<LocalDateTime> isWorkingHours = date -> date.getHour() >= workDayStartHour && date.getHour() <= workDayEndHour;
+        final Predicate<LocalDateTime> isWorkingHours = date -> date.getHour() >= workDayStartHour && date.getHour() < workDayEndHour;
 
         long workDaysInMonth = Stream.iterate(dateNow.withDayOfMonth(1), date -> date.plusDays(1))
                 .limit(dateTimeNow.getMonth().length(dateNow.isLeapYear()))
