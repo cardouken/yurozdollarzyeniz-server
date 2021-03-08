@@ -87,7 +87,7 @@ public class TrackingService {
             }
         } else {
             hoursWorked = (hoursWorked - workDayLength);
-            final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour);
+            final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour).truncatedTo(ChronoUnit.HOURS);
 
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
             earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday);
