@@ -1,6 +1,7 @@
 package ee.uustal.yurozdollarzyeniz.controller.api.response;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class TrackingResponse {
@@ -8,7 +9,7 @@ public class TrackingResponse {
     private BigDecimal earned;
     private BigDecimal earnedToday;
     private BigDecimal hourlyRate;
-    private LocalDateTime salaryPeriodStart;
+    private LocalDate salaryPeriodStart;
     private long hoursWorked;
     private long daysUntilSalary;
 
@@ -39,11 +40,11 @@ public class TrackingResponse {
         return this;
     }
 
-    public LocalDateTime getSalaryPeriodStart() {
+    public LocalDate getSalaryPeriodStart() {
         return salaryPeriodStart;
     }
 
-    public TrackingResponse setSalaryPeriodStart(LocalDateTime salaryPeriodStart) {
+    public TrackingResponse setSalaryPeriodStart(LocalDate salaryPeriodStart) {
         this.salaryPeriodStart = salaryPeriodStart;
         return this;
     }

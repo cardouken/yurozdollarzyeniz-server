@@ -1,6 +1,5 @@
 package ee.uustal.yurozdollarzyeniz.service.http;
 
-import ee.uustal.yurozdollarzyeniz.pojo.Holiday;
 import io.restassured.path.json.JsonPath;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -11,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ public class CalendarificService implements DefaultCalendarificService {
     }
 
     @Override
-    public List<Holiday> getHolidays(String countryCode, int year) {
+    public List<LocalDate> getHolidays(String countryCode, int year) {
         final Map<String, Object> requestParams = Map.ofEntries(
                 Map.entry("api_key", API_KEY),
                 Map.entry("country", countryCode),
@@ -58,12 +58,12 @@ public class CalendarificService implements DefaultCalendarificService {
         return parseJson(response.getBody());
     }
 
-    private List<Holiday> parseJson(String json) {
-        final JsonPath jsonPath = JsonPath.from(json);
-        final List<Holiday> holidays = jsonPath.getList("response.holidays", Holiday.class);
+    private List<LocalDate> parseJson(String json) {
+        final List<String> holidays = JsonPath.from(json).getList("response.holidays.date.iso", String.class);
 
         return holidays.stream()
-                .filter(d -> d.getDate().getDayOfWeek() != DayOfWeek.SATURDAY && d.getDate().getDayOfWeek() != DayOfWeek.SUNDAY)
+                .map(LocalDate::parse)
+                .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY && d.getDayOfWeek() != DayOfWeek.SUNDAY)
                 .collect(Collectors.toList());
     }
 }
