@@ -34,16 +34,16 @@ public class TrackingService {
         final int workDayStartHour = request.getWorkDayStartHour();
         final int workDayLength = request.getWorkDayLengthInHours();
         final int workDayEndHour = workDayStartHour + workDayLength;
+        final Double overtimeMultiplier = Optional.ofNullable(request.getOvertimeMultiplier()).orElse(1.5);
         final LocalDateTime dateTimeNow = timeProvider.dateTimeNow();
         final LocalDate dateNow = timeProvider.dateNow();
-        final Double overtimeMultiplier = Optional.ofNullable(request.getOvertimeMultiplier()).orElse(1.5);
 
         final List<LocalDate> weekDayHolidays = Optional.ofNullable(request.getLocale())
-                .map(l -> calendarificService.getHolidays(request.getLocale(), dateNow.getYear()))
+                .map(locale -> calendarificService.getHolidays(locale, dateNow.getYear()))
                 .orElse(new ArrayList<>());
 
         final Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
-        final Predicate<LocalDate> isHoliday = date -> weekDayHolidays.stream().anyMatch(wdh -> Objects.equals(wdh, date));
+        final Predicate<LocalDate> isHoliday = date -> weekDayHolidays.stream().anyMatch(holiday -> Objects.equals(holiday, date));
         final Predicate<LocalDateTime> isWorkingHours = date -> date.getHour() >= workDayStartHour && date.getHour() < workDayEndHour;
 
         long workDaysInMonth = Stream.iterate(dateNow.withDayOfMonth(1), date -> date.plusDays(1))
@@ -53,7 +53,6 @@ public class TrackingService {
                 .count();
         long shortDayHours = getShortDayHours(request.getLocale(), weekDayHolidays);
         long workHoursInMonth = workDaysInMonth * workDayLength - shortDayHours;
-        final double hourlySalary = request.getMonthlySalary() / workHoursInMonth;
 
         LocalDate lastSalaryPaymentDate = dateNow;
         lastSalaryPaymentDate = lastSalaryPaymentDate.withDayOfMonth(salaryDate);
@@ -68,12 +67,13 @@ public class TrackingService {
                 .filter(isWeekend.negate())
                 .filter(isHoliday.negate())
                 .count();
-        long hoursWorked = daysWorked * workDayLength - shortDayHours;
 
+        final double hourlySalary = request.getMonthlySalary() / workHoursInMonth;
         BigDecimal earnedOvertime = null;
         if (request.getOvertimeHours() != null) {
             earnedOvertime = BigDecimal.valueOf(request.getOvertimeHours() * hourlySalary * overtimeMultiplier);
         }
+        long hoursWorked = daysWorked * workDayLength - shortDayHours;
 
         BigDecimal earnedTotal;
         BigDecimal earnedToday = null;
@@ -82,9 +82,6 @@ public class TrackingService {
                 hoursWorked -= workDayLength;
             }
             earnedTotal = BigDecimal.valueOf(hourlySalary * hoursWorked);
-            if (earnedOvertime != null) {
-                earnedTotal = earnedTotal.add(earnedOvertime);
-            }
         } else {
             hoursWorked -= workDayLength;
             final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour).truncatedTo(ChronoUnit.HOURS);
@@ -92,15 +89,10 @@ public class TrackingService {
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
             earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday);
             earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary));
-            if (earnedOvertime != null) {
-                earnedTotal = earnedTotal.add(earnedOvertime);
-            }
             hoursWorked += ChronoUnit.HOURS.between(dayStart, dateTimeNow);
         }
-
-        long daysUntilNextSalary = 0;
-        if (lastSalaryPaymentDate.getMonthValue() < dateTimeNow.getMonthValue() || lastSalaryPaymentDate.getMonth() == dateTimeNow.getMonth()) {
-            daysUntilNextSalary = dateNow.until(lastSalaryPaymentDate.plusMonths(1), ChronoUnit.DAYS);
+        if (earnedOvertime != null) {
+            earnedTotal = earnedTotal.add(earnedOvertime);
         }
 
         return new TrackingResponse()
@@ -110,7 +102,7 @@ public class TrackingService {
                 .setHourlyRate(BigDecimal.valueOf(hourlySalary))
                 .setHoursWorked(hoursWorked + Optional.ofNullable(request.getOvertimeHours()).orElse(0))
                 .setSalaryPeriodStart(lastSalaryPaymentDate)
-                .setDaysUntilSalary(daysUntilNextSalary);
+                .setDaysUntilSalary(dateNow.until(lastSalaryPaymentDate.plusMonths(1), ChronoUnit.DAYS));
     }
 
     private long getShortDayHours(String locale, List<LocalDate> weekDayHolidays) {
