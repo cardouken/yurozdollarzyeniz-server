@@ -29,6 +29,8 @@ public class TrackingRequest {
 
     private Integer overtimeHours;
 
+    private Double overtimeMultiplier;
+
     public int getWorkDayStartHour() {
         return workDayStartHour;
     }
@@ -80,6 +82,15 @@ public class TrackingRequest {
 
     public TrackingRequest setOvertimeHours(Integer overtimeHours) {
         this.overtimeHours = overtimeHours;
+        return this;
+    }
+
+    public Double getOvertimeMultiplier() {
+        return overtimeMultiplier;
+    }
+
+    public TrackingRequest setOvertimeMultiplier(Double overtimeMultiplier) {
+        this.overtimeMultiplier = overtimeMultiplier;
         return this;
     }
 }

@@ -146,6 +146,22 @@ public class TrackingTest extends BaseTest {
     }
 
     @Test
+    public void test_overtime_hours_with_custom_multiplier() {
+        // given
+        timeProvider.tamperTime(WORK_HOURS);
+
+        // when -> then
+        getTracking().overtimeHours(10, 3).buildApi()
+                .assertThat("earnedToday", "29.35")
+                .assertThat("earnedOvertime", "440.22")
+                .assertThat("earned", "704.35")
+                .assertThat("hourlyRate", "14.67")
+                .assertThat("hoursWorked", "18")
+                .assertThat("daysUntilSalary", "25")
+                .assertThat("salaryPeriodStart", "2021-02-28");
+    }
+
+    @Test
     public void test_zero_salary() {
         // given
         timeProvider.tamperTime(WORK_HOURS);
