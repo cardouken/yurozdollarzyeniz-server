@@ -7,6 +7,7 @@ import ee.uustal.yurozdollarzyeniz.service.http.DefaultCalendarificService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -87,7 +88,7 @@ public class TrackingService {
             final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour).truncatedTo(ChronoUnit.HOURS);
 
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
-            earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday);
+            earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday).setScale(2, RoundingMode.HALF_UP);
             earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary));
             hoursWorked += ChronoUnit.HOURS.between(dayStart, dateTimeNow);
         }
@@ -96,7 +97,7 @@ public class TrackingService {
         }
 
         return new TrackingResponse()
-                .setEarned(earnedTotal)
+                .setEarned(earnedTotal.setScale(2, RoundingMode.HALF_UP))
                 .setEarnedToday(earnedToday)
                 .setEarnedOvertime(earnedOvertime)
                 .setHourlyRate(BigDecimal.valueOf(hourlySalary))
