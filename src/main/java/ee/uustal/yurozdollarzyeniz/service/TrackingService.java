@@ -96,9 +96,9 @@ public class TrackingService {
             earnedTotal = earnedTotal.add(earnedOvertime);
         }
 
-        // salary should be paid out on the last business day in case payment date is a weekend
+        // salary should be paid out on the last business day in case payment date is a weekend or a holiday
         LocalDate nextSalaryPaymentDate = lastSalaryPaymentDate.plusMonths(1);
-        while (isWeekend.test(nextSalaryPaymentDate)) {
+        while (isWeekend.test(nextSalaryPaymentDate) || isHoliday.test(nextSalaryPaymentDate)) {
             nextSalaryPaymentDate = nextSalaryPaymentDate.minusDays(1);
         }
         final long daysUntilSalary = dateNow.until(nextSalaryPaymentDate, ChronoUnit.DAYS);
