@@ -12,6 +12,7 @@ public class TrackingResponse {
     private LocalDate salaryPeriodStart;
     private long hoursWorked;
     private long daysUntilSalary;
+    private boolean workingHours;
 
     public BigDecimal getEarned() {
         return earned;
@@ -73,6 +74,15 @@ public class TrackingResponse {
 
     public TrackingResponse setDaysUntilSalary(long daysUntilSalary) {
         this.daysUntilSalary = daysUntilSalary;
+        return this;
+    }
+
+    public boolean isWorkingHours() {
+        return workingHours;
+    }
+
+    public TrackingResponse setIsWorkingHours(boolean workingHours) {
+        this.workingHours = workingHours;
         return this;
     }
 }

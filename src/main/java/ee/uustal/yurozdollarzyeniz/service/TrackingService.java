@@ -78,7 +78,17 @@ public class TrackingService {
 
         BigDecimal earnedTotal;
         BigDecimal earnedToday = null;
-        if (!isWorkingHours.test(dateTimeNow) || isWeekend.test(dateNow) || isHoliday.test(dateNow)) {
+        final boolean isWorkTime = isWorkingHours.test(dateTimeNow) && !isWeekend.test(dateNow) && !isHoliday.test(dateNow);
+        if (isWorkTime) {
+            hoursWorked -= workDayLength;
+            final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour).truncatedTo(ChronoUnit.HOURS);
+
+            final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
+            earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday).setScale(2, RoundingMode.HALF_UP);
+            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary));
+            hoursWorked += ChronoUnit.HOURS.between(dayStart, dateTimeNow);
+
+        } else {
             if (!isWeekend.test(dateNow) && dateTimeNow.isBefore(dateTimeNow.withHour(workDayStartHour).withMinute(0).withSecond(0))) {
                 hoursWorked -= workDayLength;
                 earnedToday = BigDecimal.ZERO;
@@ -87,14 +97,6 @@ public class TrackingService {
             if (!isWorkingHours.test(dateTimeNow) && dateTimeNow.isAfter(dateTimeNow.withHour(workDayEndHour - 1).withMinute(59).withSecond(59))) {
                 earnedToday = BigDecimal.valueOf(hourlySalary * workDayLength).setScale(2, RoundingMode.HALF_UP);
             }
-        } else {
-            hoursWorked -= workDayLength;
-            final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour).truncatedTo(ChronoUnit.HOURS);
-
-            final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
-            earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday).setScale(2, RoundingMode.HALF_UP);
-            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary));
-            hoursWorked += ChronoUnit.HOURS.between(dayStart, dateTimeNow);
         }
         if (earnedOvertime != null) {
             earnedTotal = earnedTotal.add(earnedOvertime);
@@ -114,7 +116,8 @@ public class TrackingService {
                 .setHourlyRate(BigDecimal.valueOf(hourlySalary))
                 .setHoursWorked(hoursWorked + Optional.ofNullable(request.getOvertimeHours()).orElse(0))
                 .setSalaryPeriodStart(lastSalaryPaymentDate)
-                .setDaysUntilSalary(daysUntilSalary);
+                .setDaysUntilSalary(daysUntilSalary)
+                .setIsWorkingHours(isWorkTime);
     }
 
     private long getShortDayHours(String locale, List<LocalDate> weekDayHolidays) {
