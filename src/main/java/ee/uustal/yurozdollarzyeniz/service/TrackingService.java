@@ -96,6 +96,13 @@ public class TrackingService {
             earnedTotal = earnedTotal.add(earnedOvertime);
         }
 
+        // salary should be paid out on the last business day in case payment date is a weekend
+        LocalDate nextSalaryPaymentDate = lastSalaryPaymentDate.plusMonths(1);
+        while (isWeekend.test(nextSalaryPaymentDate)) {
+            nextSalaryPaymentDate = nextSalaryPaymentDate.minusDays(1);
+        }
+        final long daysUntilSalary = dateNow.until(nextSalaryPaymentDate, ChronoUnit.DAYS);
+
         return new TrackingResponse()
                 .setEarned(earnedTotal.setScale(2, RoundingMode.HALF_UP))
                 .setEarnedToday(earnedToday)
@@ -103,7 +110,7 @@ public class TrackingService {
                 .setHourlyRate(BigDecimal.valueOf(hourlySalary))
                 .setHoursWorked(hoursWorked + Optional.ofNullable(request.getOvertimeHours()).orElse(0))
                 .setSalaryPeriodStart(lastSalaryPaymentDate)
-                .setDaysUntilSalary(dateNow.until(lastSalaryPaymentDate.plusMonths(1), ChronoUnit.DAYS));
+                .setDaysUntilSalary(daysUntilSalary);
     }
 
     private long getShortDayHours(String locale, List<LocalDate> weekDayHolidays) {
