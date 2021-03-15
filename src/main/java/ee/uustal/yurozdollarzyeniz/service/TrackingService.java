@@ -47,6 +47,7 @@ public class TrackingService {
         final Predicate<LocalDate> isHoliday = date -> weekDayHolidays.stream().anyMatch(holiday -> Objects.equals(holiday, date));
         final Predicate<LocalDateTime> isWorkingHours = date -> date.getHour() >= workDayStartHour && date.getHour() < workDayEndHour;
 
+        // todo should actually calculate working days and hours from the salary date instead of from the 1st but also calculate OT based on actual monthly hours
         long workDaysInMonth = Stream.iterate(dateNow.withDayOfMonth(1), date -> date.plusDays(1))
                 .limit(dateTimeNow.getMonth().length(dateNow.isLeapYear()))
                 .filter(isWeekend.negate())
@@ -66,7 +67,6 @@ public class TrackingService {
         long daysWorked = Stream.iterate(lastSalaryPaymentDate, date -> date.plusDays(1))
                 .limit(daysSinceLastSalary)
                 .filter(isWeekend.negate())
-                .filter(isHoliday.negate())
                 .count();
 
         final double hourlySalary = request.getMonthlySalary() / workHoursInMonth;
