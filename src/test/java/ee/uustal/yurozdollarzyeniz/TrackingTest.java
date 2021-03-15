@@ -28,7 +28,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "18")
                 .assertThat("daysUntilSalary", "23")
-                .assertThat("salaryPeriodStart", "2021-02-28")
+                .assertThat("salaryPeriodStart", "2021-02-26")
                 .assertThat("workingHours", "true");
     }
 
@@ -44,7 +44,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "16")
                 .assertThat("daysUntilSalary", "23")
-                .assertThat("salaryPeriodStart", "2021-02-28")
+                .assertThat("salaryPeriodStart", "2021-02-26")
                 .assertThat("workingHours", "false");
     }
 
@@ -60,7 +60,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "24")
                 .assertThat("daysUntilSalary", "23")
-                .assertThat("salaryPeriodStart", "2021-02-28")
+                .assertThat("salaryPeriodStart", "2021-02-26")
                 .assertThat("workingHours", "false");
     }
 
@@ -76,7 +76,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "40")
                 .assertThat("daysUntilSalary", "19")
-                .assertThat("salaryPeriodStart", "2021-02-28")
+                .assertThat("salaryPeriodStart", "2021-02-26")
                 .assertThat("workingHours", "false");
     }
 
@@ -92,7 +92,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "18")
                 .assertThat("daysUntilSalary", "23")
-                .assertThat("salaryPeriodStart", "2021-02-28")
+                .assertThat("salaryPeriodStart", "2021-02-26")
                 .assertThat("workingHours", "true");
     }
 
@@ -150,7 +150,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "28")
                 .assertThat("daysUntilSalary", "23")
-                .assertThat("salaryPeriodStart", "2021-02-28")
+                .assertThat("salaryPeriodStart", "2021-02-26")
                 .assertThat("workingHours", "true");
     }
 
@@ -167,7 +167,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "28")
                 .assertThat("daysUntilSalary", "23")
-                .assertThat("salaryPeriodStart", "2021-02-28")
+                .assertThat("salaryPeriodStart", "2021-02-26")
                 .assertThat("workingHours", "true");
     }
 
@@ -183,7 +183,7 @@ public class TrackingTest extends BaseTest {
                 .assertThat("hourlyRate", "0.0")
                 .assertThat("hoursWorked", "18")
                 .assertThat("daysUntilSalary", "23")
-                .assertThat("salaryPeriodStart", "2021-02-28")
+                .assertThat("salaryPeriodStart", "2021-02-26")
                 .assertThat("workingHours", "true");
     }
 
