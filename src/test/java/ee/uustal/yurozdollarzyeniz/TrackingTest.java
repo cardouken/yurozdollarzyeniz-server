@@ -38,7 +38,7 @@ public class TrackingTest extends BaseTest {
 
         // when -> then
         getTracking().buildApi()
-                .assertNotExists("earnedToday")
+                .assertThat("earnedToday", "0.0")
                 .assertThat("earned", "234.78")
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "16")
@@ -53,7 +53,7 @@ public class TrackingTest extends BaseTest {
 
         // when -> then
         getTracking().buildApi()
-                .assertNotExists("earnedToday")
+                .assertThat("earnedToday", "117.39")
                 .assertThat("earned", "352.17")
                 .assertThat("hourlyRate", "14.67")
                 .assertThat("hoursWorked", "24")
@@ -177,13 +177,13 @@ public class TrackingTest extends BaseTest {
     }
 
     @Test
-    public void test_workday_end() {
+    public void test_workday_ending_after_daily_work_hours() {
         // given
         timeProvider.tamperTime(LocalDateTime.of(2021, 6, 6, 18, 0));
 
         // when
         getTracking().workDayStartHour(10).workingHours(8).buildApi()
-                .assertNotExists("earnedToday");
+                .assertThat("earnedToday", "122.73");
     }
 
     @Test

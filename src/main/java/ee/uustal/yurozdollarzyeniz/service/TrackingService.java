@@ -79,10 +79,14 @@ public class TrackingService {
         BigDecimal earnedTotal;
         BigDecimal earnedToday = null;
         if (!isWorkingHours.test(dateTimeNow) || isWeekend.test(dateNow) || isHoliday.test(dateNow)) {
-            if (!isWeekend.test(dateNow) && dateTimeNow.isBefore(dateTimeNow.withHour(workDayStartHour))) {
+            if (!isWeekend.test(dateNow) && dateTimeNow.isBefore(dateTimeNow.withHour(workDayStartHour).withMinute(0).withSecond(0))) {
                 hoursWorked -= workDayLength;
+                earnedToday = BigDecimal.ZERO;
             }
             earnedTotal = BigDecimal.valueOf(hourlySalary * hoursWorked);
+            if (!isWorkingHours.test(dateTimeNow) && dateTimeNow.isAfter(dateTimeNow.withHour(workDayEndHour - 1).withMinute(59).withSecond(59))) {
+                earnedToday = BigDecimal.valueOf(hourlySalary * workDayLength).setScale(2, RoundingMode.HALF_UP);
+            }
         } else {
             hoursWorked -= workDayLength;
             final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour).truncatedTo(ChronoUnit.HOURS);
