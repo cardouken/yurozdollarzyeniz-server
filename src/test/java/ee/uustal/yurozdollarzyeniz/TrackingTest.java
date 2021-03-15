@@ -23,9 +23,9 @@ public class TrackingTest extends BaseTest {
 
         // when -> then
         getTracking().buildApi()
-                .assertThat("earnedToday", "29.35")
-                .assertThat("earned", "264.13")
-                .assertThat("hourlyRate", "14.67")
+                .assertThat("earnedToday", "33.75")
+                .assertThat("earned", "303.75")
+                .assertThat("hourlyRate", "16.88")
                 .assertThat("hoursWorked", "18")
                 .assertThat("daysUntilSalary", "23")
                 .assertThat("salaryPeriodStart", "2021-02-26")
@@ -40,8 +40,8 @@ public class TrackingTest extends BaseTest {
         // when -> then
         getTracking().buildApi()
                 .assertThat("earnedToday", "0.0")
-                .assertThat("earned", "234.78")
-                .assertThat("hourlyRate", "14.67")
+                .assertThat("earned", "270.0")
+                .assertThat("hourlyRate", "16.88")
                 .assertThat("hoursWorked", "16")
                 .assertThat("daysUntilSalary", "23")
                 .assertThat("salaryPeriodStart", "2021-02-26")
@@ -55,9 +55,9 @@ public class TrackingTest extends BaseTest {
 
         // when -> then
         getTracking().buildApi()
-                .assertThat("earnedToday", "117.39")
-                .assertThat("earned", "352.17")
-                .assertThat("hourlyRate", "14.67")
+                .assertThat("earnedToday", "135.0")
+                .assertThat("earned", "405.0")
+                .assertThat("hourlyRate", "16.88")
                 .assertThat("hoursWorked", "24")
                 .assertThat("daysUntilSalary", "23")
                 .assertThat("salaryPeriodStart", "2021-02-26")
@@ -72,8 +72,8 @@ public class TrackingTest extends BaseTest {
         // when -> then
         getTracking().buildApi()
                 .assertNotExists("earnedToday")
-                .assertThat("earned", "586.96")
-                .assertThat("hourlyRate", "14.67")
+                .assertThat("earned", "675.0")
+                .assertThat("hourlyRate", "16.88")
                 .assertThat("hoursWorked", "40")
                 .assertThat("daysUntilSalary", "19")
                 .assertThat("salaryPeriodStart", "2021-02-26")
@@ -87,9 +87,9 @@ public class TrackingTest extends BaseTest {
 
         // when -> then
         getTracking().salaryDate(28).buildApi()
-                .assertThat("earned", "264.13")
-                .assertThat("earnedToday", "29.35")
-                .assertThat("hourlyRate", "14.67")
+                .assertThat("earned", "303.75")
+                .assertThat("earnedToday", "33.75")
+                .assertThat("hourlyRate", "16.88")
                 .assertThat("hoursWorked", "18")
                 .assertThat("daysUntilSalary", "23")
                 .assertThat("salaryPeriodStart", "2021-02-26")
@@ -144,10 +144,10 @@ public class TrackingTest extends BaseTest {
 
         // when -> then
         getTracking().overtimeHours(10).buildApi()
-                .assertThat("earnedToday", "29.35")
+                .assertThat("earnedToday", "33.75")
                 .assertThat("earnedOvertime", "220.11")
-                .assertThat("earned", "484.24")
-                .assertThat("hourlyRate", "14.67")
+                .assertThat("earned", "523.86")
+                .assertThat("hourlyRate", "16.88")
                 .assertThat("hoursWorked", "28")
                 .assertThat("daysUntilSalary", "23")
                 .assertThat("salaryPeriodStart", "2021-02-26")
@@ -161,10 +161,10 @@ public class TrackingTest extends BaseTest {
 
         // when -> then
         getTracking().overtimeHours(10, 3).buildApi()
-                .assertThat("earnedToday", "29.35")
+                .assertThat("earnedToday", "33.75")
                 .assertThat("earnedOvertime", "440.22")
-                .assertThat("earned", "704.35")
-                .assertThat("hourlyRate", "14.67")
+                .assertThat("earned", "743.97")
+                .assertThat("hourlyRate", "16.88")
                 .assertThat("hoursWorked", "28")
                 .assertThat("daysUntilSalary", "23")
                 .assertThat("salaryPeriodStart", "2021-02-26")
@@ -205,6 +205,16 @@ public class TrackingTest extends BaseTest {
         // when -> then
         getTracking().salaryDate(28).buildApi()
                 .assertThat("daysUntilSalary", "11");
+    }
+
+    @Test
+    public void test_correct_salary() {
+        // given
+        timeProvider.tamperTime(LocalDateTime.of(2021, 4, 27, 23, 0));
+
+        // when -> then
+        getTracking().salaryDate(28).buildApi()
+                .assertThat("earned", "2700.0");
     }
 
 }

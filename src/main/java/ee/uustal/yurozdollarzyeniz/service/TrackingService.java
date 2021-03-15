@@ -69,12 +69,21 @@ public class TrackingService {
                 .filter(isHoliday.negate())
                 .count();
 
+        long actualDaysWorked = Stream.iterate(lastSalaryPaymentDate, date -> date.plusDays(1))
+                .limit(ChronoUnit.DAYS.between(lastSalaryPaymentDate, lastSalaryPaymentDate.plusMonths(1)))
+                .filter(isWeekend.negate())
+                .filter(isHoliday.negate())
+                .count();
+
+        long actualWorkHoursInMonth = actualDaysWorked * workDayLength - shortDayHours;
+
         final double hourlySalary = request.getMonthlySalary() / workHoursInMonth;
         BigDecimal earnedOvertime = null;
         if (request.getOvertimeHours() != null) {
             earnedOvertime = BigDecimal.valueOf(request.getOvertimeHours() * hourlySalary * overtimeMultiplier);
         }
         long hoursWorked = daysWorked * workDayLength - shortDayHours;
+        final double actualHourlySalary = request.getMonthlySalary() / actualWorkHoursInMonth;
 
         BigDecimal earnedTotal;
         BigDecimal earnedToday = null;
@@ -84,8 +93,8 @@ public class TrackingService {
             final LocalDateTime dayStart = dateTimeNow.withHour(workDayStartHour).truncatedTo(ChronoUnit.HOURS);
 
             final long secondsWorkedToday = ChronoUnit.SECONDS.between(dayStart, dateTimeNow);
-            earnedToday = BigDecimal.valueOf(hourlySalary / 60 / 60 * secondsWorkedToday).setScale(2, RoundingMode.HALF_UP);
-            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * hourlySalary));
+            earnedToday = BigDecimal.valueOf(actualHourlySalary / 60 / 60 * secondsWorkedToday).setScale(2, RoundingMode.HALF_UP);
+            earnedTotal = earnedToday.add(BigDecimal.valueOf(hoursWorked * actualHourlySalary));
             hoursWorked += ChronoUnit.HOURS.between(dayStart, dateTimeNow);
 
         } else {
@@ -93,9 +102,9 @@ public class TrackingService {
                 hoursWorked -= workDayLength;
                 earnedToday = BigDecimal.ZERO;
             }
-            earnedTotal = BigDecimal.valueOf(hourlySalary * hoursWorked);
+            earnedTotal = BigDecimal.valueOf(actualHourlySalary * hoursWorked);
             if (!isWorkingHours.test(dateTimeNow) && dateTimeNow.isAfter(dateTimeNow.withHour(workDayEndHour - 1).withMinute(59).withSecond(59))) {
-                earnedToday = BigDecimal.valueOf(hourlySalary * workDayLength).setScale(2, RoundingMode.HALF_UP);
+                earnedToday = BigDecimal.valueOf(actualHourlySalary * workDayLength).setScale(2, RoundingMode.HALF_UP);
             }
         }
         if (earnedOvertime != null) {
@@ -114,7 +123,7 @@ public class TrackingService {
                 .setEarned(earnedTotal.setScale(2, RoundingMode.HALF_UP))
                 .setEarnedToday(earnedToday)
                 .setEarnedOvertime(earnedOvertime)
-                .setHourlyRate(BigDecimal.valueOf(hourlySalary))
+                .setHourlyRate(BigDecimal.valueOf(actualHourlySalary))
                 .setHoursWorked(hoursWorked + Optional.ofNullable(request.getOvertimeHours()).orElse(0))
                 .setSalaryPeriodStart(lastSalaryPaymentDate)
                 .setDaysUntilSalary(daysUntilSalary)
