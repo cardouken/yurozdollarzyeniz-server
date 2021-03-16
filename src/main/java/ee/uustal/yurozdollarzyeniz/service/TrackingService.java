@@ -47,43 +47,29 @@ public class TrackingService {
         final Predicate<LocalDate> isHoliday = date -> weekDayHolidays.stream().anyMatch(holiday -> Objects.equals(holiday, date));
         final Predicate<LocalDateTime> isWorkingHours = date -> date.getHour() >= workDayStartHour && date.getHour() < workDayEndHour;
 
-        long workDaysInMonth = Stream.iterate(dateNow.withDayOfMonth(1), date -> date.plusDays(1))
-                .limit(dateTimeNow.getMonth().length(dateNow.isLeapYear()))
-                .filter(isWeekend.negate())
-                .filter(isHoliday.negate())
-                .count();
-        long shortDayHours = getShortDayHours(request.getLocale(), weekDayHolidays);
-        long workHoursInMonth = workDaysInMonth * workDayLength - shortDayHours;
+        final long workDaysInMonth = getDaysWorked(dateNow.withDayOfMonth(1), dateTimeNow.getMonth().length(dateNow.isLeapYear()), isWeekend, isHoliday);
+        final long shortDayHours = getShortDayHours(request.getLocale(), weekDayHolidays);
+        final long workHoursInMonth = getHoursWorked(workDaysInMonth, workDayLength, shortDayHours);
 
-        LocalDate lastSalaryPaymentDate = dateNow;
-        lastSalaryPaymentDate = lastSalaryPaymentDate.withDayOfMonth(salaryDate);
+        LocalDate lastSalaryPaymentDate = dateNow.withDayOfMonth(salaryDate);
         long daysSinceLastSalary;
         if (dateTimeNow.getDayOfMonth() < salaryDate) {
             lastSalaryPaymentDate = lastSalaryPaymentDate.minusMonths(1);
         }
         daysSinceLastSalary = ChronoUnit.DAYS.between(lastSalaryPaymentDate, dateTimeNow.plusDays(1));
 
-        long daysWorked = Stream.iterate(lastSalaryPaymentDate, date -> date.plusDays(1))
-                .limit(daysSinceLastSalary)
-                .filter(isWeekend.negate())
-                .filter(isHoliday.negate())
-                .count();
+        long daysWorked = getDaysWorked(lastSalaryPaymentDate, daysSinceLastSalary, isWeekend, isHoliday);
+        long actualDaysWorked = getDaysWorked(lastSalaryPaymentDate, ChronoUnit.DAYS.between(lastSalaryPaymentDate, lastSalaryPaymentDate.plusMonths(1)), isWeekend, isHoliday);
 
-        long actualDaysWorked = Stream.iterate(lastSalaryPaymentDate, date -> date.plusDays(1))
-                .limit(ChronoUnit.DAYS.between(lastSalaryPaymentDate, lastSalaryPaymentDate.plusMonths(1)))
-                .filter(isWeekend.negate())
-                .filter(isHoliday.negate())
-                .count();
+        long hoursWorked = getHoursWorked(daysWorked, workDayLength, shortDayHours);
+        long actualHoursWorked = getHoursWorked(actualDaysWorked, workDayLength, shortDayHours);
+        final double actualHourlySalary = request.getMonthlySalary() / actualHoursWorked;
 
-        long actualWorkHoursInMonth = actualDaysWorked * workDayLength - shortDayHours;
-
-        final double hourlySalary = request.getMonthlySalary() / workHoursInMonth;
         BigDecimal earnedOvertime = null;
         if (request.getOvertimeHours() != null) {
+            final double hourlySalary = request.getMonthlySalary() / workHoursInMonth;
             earnedOvertime = BigDecimal.valueOf(request.getOvertimeHours() * hourlySalary * overtimeMultiplier);
         }
-        long hoursWorked = daysWorked * workDayLength - shortDayHours;
-        final double actualHourlySalary = request.getMonthlySalary() / actualWorkHoursInMonth;
 
         BigDecimal earnedTotal;
         BigDecimal earnedToday = null;
@@ -128,6 +114,18 @@ public class TrackingService {
                 .setSalaryPeriodStart(lastSalaryPaymentDate)
                 .setDaysUntilSalary(daysUntilSalary)
                 .setIsWorkingHours(isWorkTime);
+    }
+
+    private long getHoursWorked(long days, int workDayLength, long shortDayHours) {
+        return days * workDayLength - shortDayHours;
+    }
+
+    private long getDaysWorked(LocalDate startDate, long limit, Predicate<LocalDate> isWeekend, Predicate<LocalDate> isHoliday) {
+        return Stream.iterate(startDate, date -> date.plusDays(1))
+                .limit(limit)
+                .filter(isWeekend.negate())
+                .filter(isHoliday.negate())
+                .count();
     }
 
     private long getShortDayHours(String locale, List<LocalDate> weekDayHolidays) {
