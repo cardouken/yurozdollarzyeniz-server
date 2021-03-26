@@ -103,7 +103,14 @@ public class TrackingService {
             lastSalaryPaymentDate = lastSalaryPaymentDate.minusDays(1);
             nextSalaryPaymentDate = nextSalaryPaymentDate.minusDays(1);
         }
-        final long daysUntilSalary = dateNow.until(nextSalaryPaymentDate, ChronoUnit.DAYS);
+        long daysUntilSalary = dateNow.until(nextSalaryPaymentDate, ChronoUnit.DAYS);
+        if (daysUntilSalary == 0 && dateTimeNow.getHour() >= workDayEndHour) {
+            nextSalaryPaymentDate = nextSalaryPaymentDate.plusMonths(1).withDayOfMonth(salaryDate);
+            while (isWeekend.test(nextSalaryPaymentDate) || isHoliday.test(nextSalaryPaymentDate)) {
+                nextSalaryPaymentDate = nextSalaryPaymentDate.minusDays(1);
+            }
+        }
+        daysUntilSalary = dateNow.until(nextSalaryPaymentDate, ChronoUnit.DAYS);
 
         return new TrackingResponse()
                 .setEarned(earnedTotal.setScale(2, RoundingMode.HALF_UP))
