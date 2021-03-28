@@ -47,11 +47,9 @@ public class TrackingService {
         final Predicate<LocalDate> isHoliday = date -> weekDayHolidays.stream().anyMatch(holiday -> Objects.equals(holiday, date));
         final Predicate<LocalDateTime> isWorkingHours = date -> date.getHour() >= workDayStartHour && date.getHour() < workDayEndHour;
 
-        long workDaysInMonth;
+        long workDaysInMonth = getDaysWorked(dateNow.withDayOfMonth(1), dateTimeNow.getMonth().length(dateNow.isLeapYear()), isWeekend, isHoliday);
         if (dateNow.getDayOfMonth() > salaryDate) {
             workDaysInMonth = getDaysWorked(dateNow.plusMonths(1).withDayOfMonth(1), dateTimeNow.getMonth().plus(1).length(dateNow.isLeapYear()), isWeekend, isHoliday);
-        } else {
-            workDaysInMonth = getDaysWorked(dateNow.withDayOfMonth(1), dateTimeNow.getMonth().length(dateNow.isLeapYear()), isWeekend, isHoliday);
         }
         final long shortDayHours = getShortDayHours(request.getLocale(), weekDayHolidays);
         final long workHoursInMonth = getHoursWorked(workDaysInMonth, workDayLength, shortDayHours);
