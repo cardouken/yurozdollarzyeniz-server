@@ -217,4 +217,25 @@ public class TrackingTest extends BaseTest {
                 .assertThat("earned", "2700.0");
     }
 
+    @Test
+    public void test_salary_period_start_current_month_on_weekend() {
+        // given
+        timeProvider.tamperTime(LocalDateTime.of(2021, 3, 28, 15, 0));
+
+        // when -> then
+        getTracking().salaryDate(28).buildApi()
+                .assertThat("salaryPeriodStart", "2021-03-26");
+    }
+
+    @Test
+    public void test_next_salary_payment_date_on_payment_date() {
+        // given
+        timeProvider.tamperTime(LocalDateTime.of(2021, 3, 26, 19, 0));
+
+        // when -> then
+        getTracking().salaryDate(28).buildApi()
+                .assertThat("salaryPeriodStart", "2021-02-26")
+                .assertThat("daysUntilSalary", "33");
+    }
+
 }

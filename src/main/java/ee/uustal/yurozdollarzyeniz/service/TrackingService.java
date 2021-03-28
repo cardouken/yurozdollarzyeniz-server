@@ -100,9 +100,12 @@ public class TrackingService {
         // salary should be paid out on the last business day in case payment date is a weekend or a holiday
         LocalDate nextSalaryPaymentDate = lastSalaryPaymentDate.plusMonths(1);
         while (isWeekend.test(nextSalaryPaymentDate) || isHoliday.test(nextSalaryPaymentDate)) {
-            lastSalaryPaymentDate = lastSalaryPaymentDate.minusDays(1);
             nextSalaryPaymentDate = nextSalaryPaymentDate.minusDays(1);
         }
+        while (isWeekend.test(lastSalaryPaymentDate) || isHoliday.test(lastSalaryPaymentDate)) {
+            lastSalaryPaymentDate = lastSalaryPaymentDate.minusDays(1);
+        }
+
         long daysUntilSalary = dateNow.until(nextSalaryPaymentDate, ChronoUnit.DAYS);
         if (daysUntilSalary == 0 && dateTimeNow.getHour() >= workDayEndHour) {
             nextSalaryPaymentDate = nextSalaryPaymentDate.plusMonths(1).withDayOfMonth(salaryDate);
