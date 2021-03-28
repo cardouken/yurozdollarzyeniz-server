@@ -248,4 +248,14 @@ public class TrackingTest extends BaseTest {
                 .assertNotExists("earnedToday");
     }
 
+    @Test
+    public void test_overtime_if_past_salary_date_in_current_month() {
+        // given
+        timeProvider.tamperTime(LocalDateTime.of(2021, 3, 28, 22, 0));
+
+        // when -> then
+        getTracking().overtimeHours(1).buildApi()
+                .assertThat("earnedOvertime", "22.01");
+    }
+
 }
