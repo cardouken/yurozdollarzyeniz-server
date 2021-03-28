@@ -254,8 +254,8 @@ public class TrackingTest extends BaseTest {
         timeProvider.tamperTime(LocalDateTime.of(2021, 3, 28, 22, 0));
 
         // when -> then
-        getTracking().overtimeHours(1).buildApi()
-                .assertThat("earnedOvertime", "22.01");
+        getTracking().overtimeHours(1).locale("EE").buildApi()
+                .assertThat("earnedOvertime", "24.11");
     }
 
 }
