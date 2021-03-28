@@ -89,7 +89,7 @@ public class TrackingService {
                 earnedToday = BigDecimal.ZERO;
             }
             earnedTotal = BigDecimal.valueOf(actualHourlySalary * hoursWorked);
-            if (!isWorkingHours.test(dateTimeNow) && dateTimeNow.isAfter(dateTimeNow.withHour(workDayEndHour - 1).withMinute(59).withSecond(59))) {
+            if (!isWorkingHours.test(dateTimeNow) && !isWeekend.test(dateNow) && dateTimeNow.isAfter(dateTimeNow.withHour(workDayEndHour - 1).withMinute(59).withSecond(59))) {
                 earnedToday = BigDecimal.valueOf(actualHourlySalary * workDayLength).setScale(2, RoundingMode.HALF_UP);
             }
         }

@@ -238,4 +238,14 @@ public class TrackingTest extends BaseTest {
                 .assertThat("daysUntilSalary", "33");
     }
 
+    @Test
+    public void test_no_earnings_sunday_after_early_payment() {
+        // given
+        timeProvider.tamperTime(LocalDateTime.of(2021, 3, 28, 19, 0));
+
+        // when -> then
+        getTracking().buildApi()
+                .assertNotExists("earnedToday");
+    }
+
 }
